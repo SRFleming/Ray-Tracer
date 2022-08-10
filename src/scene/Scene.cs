@@ -51,6 +51,16 @@ namespace RayTracer
         public void Render(Image outputImage)
         {
             // Begin writing your code here...
+            Console.WriteLine(outputImage.Width + "-" + outputImage.Height + "\n");
+            int i = 0, j = 0;
+            while(i < outputImage.Width) {
+                while (j < outputImage.Height) {
+                    outputImage.SetPixel(i, j, new Color(1,1,1));
+                    j++;
+                }
+                j = 0;
+                i++;
+            }
         }
 
     }
