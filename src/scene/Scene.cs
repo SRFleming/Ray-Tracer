@@ -48,14 +48,28 @@ namespace RayTracer
         /// break it down into multiple functions as it gets more complex!
         /// </summary>
         /// <param name="outputImage">Image to store render output</param>
+
+        private Vector3 normalizedcoords(Image outputImage, float x, float y) {
+            return new Vector3(
+            outputImage.Width * (x - 0.5f),
+            outputImage.Height * (0.5f - y),
+            1.0f); // Image plane is 1 unit from camera.
+        } 
+
+        private Vector3 CoordCenter(Image outputImage, float x, float y) {
+            var NormX = (x + 0.5f) / outputImage.Height;
+            var NormY = (0.5f + y) / outputImage.Width;
+            return normalizedcoords(outputImage, NormX, NormY);
+        }
+
         public void Render(Image outputImage)
         {
             // Begin writing your code here...
-            Console.WriteLine(outputImage.Width + "-" + outputImage.Height + "\n");
+            Vector3 Origin = new Vector3(0,0,0);
             int i = 0, j = 0;
             while(i < outputImage.Width) {
                 while (j < outputImage.Height) {
-                    outputImage.SetPixel(i, j, new Color(1,1,1));
+                    new Ray(Origin,CoordCenter(outputImage, i, j));
                     j++;
                 }
                 j = 0;
@@ -65,3 +79,7 @@ namespace RayTracer
 
     }
 }
+
+//cd C:\Users\Seb\Documents\Uni\2022\Graphics and Interaction\project-1-ray-tracer-SRFleming
+//dotnet run -- -f tests/sample_scene_1.txt -o output.png
+
