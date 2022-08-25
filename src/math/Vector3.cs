@@ -41,18 +41,18 @@ namespace RayTracer
         public double LengthSq()
         {
             // Write your code here...
-            double lengthSQ = this.x * this.x + this.y * this.y + this.z * this.z;
-            return lengthSQ;
+            double lengthSquared = this.x * this.x + this.y * this.y + this.z * this.z;
+            return lengthSquared;
         }
 
         /// <summary>
         /// Compute the length of the vector.
         /// </summary>
         /// <returns>Length of the vector</returns>
-        public double Length(double x, double y, double z)
+        public double Length()
         {
             // Write your code here...
-            double Vlength = this.x + this.y + this.z;
+            double Vlength = Math.Sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
             return Vlength;
         }
 
@@ -63,7 +63,7 @@ namespace RayTracer
         public Vector3 Normalized()
         {
             // Write your code here...
-            double magnitude = this.LengthSq();
+            double magnitude = this.Length();
             return new Vector3(x/magnitude, y/magnitude, z/magnitude);
         }
 

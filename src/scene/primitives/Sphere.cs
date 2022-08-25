@@ -32,7 +32,54 @@ namespace RayTracer
         public RayHit Intersect(Ray ray)
         {
             // Write your code here...
-            return null;
+            double d0, d1, q;
+            Vector3 vposition = new Vector3(0,0,0); 
+            Vector3 vnormal = new Vector3(0,0,0); 
+            Vector3 vincident = new Vector3(0,0,0);
+            Vector3 L = ray.Origin - this.center;
+
+            /*double tca = L.Dot(rayDirection); 
+                // if (tca < 0) return false;
+            double d2 = L.LengthSq() - tca * tca; 
+            if (d2 > (this.radius * this.radius)) {return null; }
+            double thc = Math.Sqrt(this.radius * this.radius - d2); 
+            d0 = tca - thc; 
+            d1 = tca + thc; )*/
+            double a = ray.Direction.LengthSq();
+            double b = 2*(ray.Direction.Dot(L));
+            double c = L.LengthSq() - this.radius * this.radius;
+
+            double discriminant = -(b * b - 4 * a * c);
+
+            if (discriminant > 0) {
+                return null;
+            } 
+            else if (discriminant == 0) {
+                d0 = d1 = - 0.5 * b / a; 
+            }
+            else {
+                if (b > 0) {
+                    q = -0.5 * (b + Math.Sqrt(discriminant));
+                }
+                else {
+                    q = -0.5 * (b - Math.Sqrt(discriminant));
+                }
+                d0 = q / a;
+                d1 = c / q;
+            }
+            if (d0 < 0) { 
+                d0 = d1;  //if t0 is negative, let's use t1 instead 
+                if (d0 < 0) {
+                    //Console.WriteLine("FAIL 1");
+                    return null;  //both t0 and t1 are negative 
+                }
+            }
+            vposition = ray.Origin + ray.Direction * d0;
+            //Console.WriteLine("PASS");
+            Vector3 helper = vposition - this.center;
+            vnormal = helper.Normalized();
+            return new RayHit(vposition, vnormal, vincident, this.material);
+            
         }
 
         /// <summary>

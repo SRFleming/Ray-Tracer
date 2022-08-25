@@ -49,27 +49,42 @@ namespace RayTracer
         /// </summary>
         /// <param name="outputImage">Image to store render output</param>
 
-        private Vector3 normalizedcoords(Image outputImage, float x, float y) {
-            return new Vector3(
-            outputImage.Width * (x - 0.5f),
-            outputImage.Height * (0.5f - y),
-            1.0f); // Image plane is 1 unit from camera.
-        } 
+        private Ray generateRay(int i, int j, int width, int height) {
+            var aspectratio = width/ height;
 
-        private Vector3 CoordCenter(Image outputImage, float x, float y) {
-            var NormX = (x + 0.5f) / outputImage.Height;
-            var NormY = (0.5f + y) / outputImage.Width;
-            return normalizedcoords(outputImage, NormX, NormY);
-        }
+            var scale = Math.Tan((Math.PI/6));
+            var x = (2*(i + 0.5) / (float)width - 1) * aspectratio * scale;
+            var y = (1 - 2*(j + 0.5f)/(float)height) * scale;
+
+            Vector3 to3Dcoord = new Vector3(x,y,1);
+            Vector3 rayDir = to3Dcoord.Normalized();
+            Ray ray = new Ray(origin: new Vector3(0,0,0), rayDir);
+            return ray;
+        } 
 
         public void Render(Image outputImage)
         {
             // Begin writing your code here...
             Vector3 Origin = new Vector3(0,0,0);
             int i = 0, j = 0;
+            //double[,] hitmatrix = new double[outputImage.Width, outputImage.Height];
+            //Array.Clear(hitmatrix, 0, hitmatrix.Length);
             while(i < outputImage.Width) {
                 while (j < outputImage.Height) {
-                    new Ray(Origin,CoordCenter(outputImage, i, j));
+                    Ray ray = generateRay(i, j, outputImage.Width, outputImage.Height);
+                    foreach (SceneEntity entity in this.entities) {
+                        RayHit hit = entity.Intersect(ray);
+                        if (hit != null) {
+                            //if (hitmatrix[i, j] == 0) {
+                                outputImage.SetPixel(i, j, entity.Material.Color);
+                               // hitmatrix[i, j] = hit.Position.Z;
+                            //}
+                            /*else if (hit.Position.Z > hitmatrix[i, j]){
+                                outputImage.SetPixel(i, j, entity.Material.Color);
+                                hitmatrix[i, j] = hit.Position.Z;
+                            } */
+                        }
+                    }
                     j++;
                 }
                 j = 0;

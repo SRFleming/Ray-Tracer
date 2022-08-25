@@ -31,7 +31,26 @@ namespace RayTracer
         /// <returns>Hit data (or null if no intersection)</returns>
         public RayHit Intersect(Ray ray)
         {
-            return null;
+            Vector3 vposition = new Vector3(0,0,0); 
+            Vector3 vnormal = new Vector3(0,0,0); 
+            Vector3 vincident = new Vector3(0,0,0);
+            Vector3 L = this.center - ray.Origin;
+            double denom = this.normal.Dot(ray.Direction);
+            if (denom != 0) {
+                double t = (L.Dot(this.normal) / denom);
+                if (t >= 0) {
+                    vposition = ray.Origin + t * ray.Direction;
+                    vnormal = this.normal;
+                    vincident = this.normal.Cross(ray.Direction);
+                    return new RayHit(vposition, vnormal, vincident, this.Material);
+                }
+                else {
+                    return null;
+                }
+            }
+            else {
+                return null;
+            }
         }
 
         /// <summary>

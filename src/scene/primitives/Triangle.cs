@@ -31,9 +31,46 @@ namespace RayTracer
         /// <param name="ray">Ray to check</param>
         /// <returns>Hit data (or null if no intersection)</returns>
         public RayHit Intersect(Ray ray)
-        {
-            // Write your code here...
-            return null;
+        {   
+            Vector3 vposition = new Vector3(0,0,0); 
+            Vector3 vincident = new Vector3(0,0,0);
+            Vector3 v0v1 = v1 - v0;
+            Vector3 v0v2 = v2 - v0;
+            Vector3 vnormal = v0v1.Cross(v0v2);
+            
+            double determinant = - vnormal.Dot(ray.Direction);
+
+            /*if (determinant < 1e-6) {
+                //Console.WriteLine("FAIL 0");
+                if (determinant > -1e-6) {
+                    return null;
+                }
+            } */
+
+            double d = - vnormal.Dot(v0);
+
+            double t = -(vnormal.Dot(ray.Origin) + d) / determinant;
+
+            if (t < 0) {
+                //Console.WriteLine("FAIL 1");
+                return null;
+            }
+
+            /*double invDet = 1 / determinant;
+
+            /*Vector3 tvector = ray.Origin - v0;
+            Vector3 dvector = tvector.Cross(ray.Direction);
+
+            double u = v0v2.Dot(dvector) * invDet; 
+            if (u < 0) return null;
+            double v = -v0v1.Dot(dvector) * invDet; 
+            if (v < 0 || (u+v) > 1.0) return null;
+            double t = tvector.Dot(vnormal) * invDet; 
+            if (t < 0) return null; */
+
+            vposition = ray.Origin + t * ray.Direction;
+
+            return new RayHit(vposition, vnormal, vincident, this.material);
         }
 
         /// <summary>
