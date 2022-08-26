@@ -87,9 +87,9 @@ namespace RayTracer
         public Vector3 Cross(Vector3 with)
         {
             // Write your code here...
-            double a = this.y * with.z - this.z * with.y;
-            double b = this.x * with.z - this.z * with.x;
-            double c = this.x * with.y - this.y * with.x;
+            double a = (this.y * with.z) - (this.z * with.y);
+            double b = (this.z * with.x) - (this.x * with.z);
+            double c = (this.x * with.y) - (this.y * with.x);
             return new Vector3(a, b, c);
         }
 

@@ -34,41 +34,65 @@ namespace RayTracer
         {   
             Vector3 vposition = new Vector3(0,0,0); 
             Vector3 vincident = new Vector3(0,0,0);
+            
             Vector3 v0v1 = v1 - v0;
             Vector3 v0v2 = v2 - v0;
-            Vector3 vnormal = v0v1.Cross(v0v2);
-            
-            double determinant = - vnormal.Dot(ray.Direction);
-
-            /*if (determinant < 1e-6) {
-                //Console.WriteLine("FAIL 0");
-                if (determinant > -1e-6) {
-                    return null;
-                }
-            } */
-
-            double d = - vnormal.Dot(v0);
-
-            double t = -(vnormal.Dot(ray.Origin) + d) / determinant;
-
-            if (t < 0) {
-                //Console.WriteLine("FAIL 1");
+            Vector3 vnormal = v0v1.Cross(v0v2).Normalized();
+            double determinant = vnormal.Dot(ray.Direction);
+            if (determinant == 0) {
                 return null;
             }
+            double d = - vnormal.Dot(v0);
+            double t = - (vnormal.Dot(ray.Origin) + d) / determinant;
 
-            /*double invDet = 1 / determinant;
+            if (t <= 0) {
+                return null;
+            }
+            vposition = ray.Origin + t * ray.Direction;
 
-            /*Vector3 tvector = ray.Origin - v0;
+            /*Vector3 edge0 = v1 - v0; 
+            Vector3 edge1 = v2 - v1; 
+            Vector3 edge2 = v0 - v2; 
+            Vector3 C0 = vnormal - v0; 
+            Vector3 C1 = vnormal - v1; 
+            Vector3 C2 = vnormal - v2; 
+            if (vnormal.Dot(edge0.Cross(C0)) < 0 || 
+                vnormal.Dot(edge1.Cross(C1)) < 0 || 
+                vnormal.Dot(edge2.Cross(C2)) < 0) return null;
+            */
+                // Step 2: inside-outside test
+             Vector3 C;  //vector perpendicular to triangle's plane 
+
+            // edge 0
+            Vector3 edge0 = v1 - v0; 
+            Vector3 vp0 = vposition - v0; 
+            C = edge0.Cross(vp0); 
+            if (vnormal.Dot(C) < 0) return null;  //P is on the right side 
+        
+            // edge 1
+            Vector3 edge1 = v2 - v1; 
+            Vector3 vp1 = vposition - v1; 
+            C = edge1.Cross(vp1); 
+            if (vnormal.Dot(C) < 0)  return null;  //P is on the right side 
+        
+            // edge 2
+            Vector3 edge2 = v0 - v2; 
+            Vector3 vp2 = vposition - v2; 
+            C = edge2.Cross(vp2); 
+            if (vnormal.Dot(C) < 0) return null;
+            /*
+            double invDet = 1 / determinant;
+
+            Vector3 tvector = ray.Origin - v0;
             Vector3 dvector = tvector.Cross(ray.Direction);
 
             double u = v0v2.Dot(dvector) * invDet; 
             if (u < 0) return null;
             double v = -v0v1.Dot(dvector) * invDet; 
-            if (v < 0 || (u+v) > 1.0) return null;
+            if (v < 0) return null;
+            if ((u+v) > 1.0) return null;
             double t = tvector.Dot(vnormal) * invDet; 
             if (t < 0) return null; */
-
-            vposition = ray.Origin + t * ray.Direction;
 
             return new RayHit(vposition, vnormal, vincident, this.material);
         }
