@@ -50,16 +50,6 @@ namespace RayTracer
             }
             vposition = ray.Origin + t * ray.Direction;
 
-            /*Vector3 edge0 = v1 - v0; 
-            Vector3 edge1 = v2 - v1; 
-            Vector3 edge2 = v0 - v2; 
-            Vector3 C0 = vnormal - v0; 
-            Vector3 C1 = vnormal - v1; 
-            Vector3 C2 = vnormal - v2; 
-            if (vnormal.Dot(edge0.Cross(C0)) < 0 || 
-                vnormal.Dot(edge1.Cross(C1)) < 0 || 
-                vnormal.Dot(edge2.Cross(C2)) < 0) return null;
-            */
                 // Step 2: inside-outside test
              Vector3 C;  //vector perpendicular to triangle's plane 
 
@@ -80,19 +70,6 @@ namespace RayTracer
             Vector3 vp2 = vposition - v2; 
             C = edge2.Cross(vp2); 
             if (vnormal.Dot(C) < 0) return null;
-            /*
-            double invDet = 1 / determinant;
-
-            Vector3 tvector = ray.Origin - v0;
-            Vector3 dvector = tvector.Cross(ray.Direction);
-
-            double u = v0v2.Dot(dvector) * invDet; 
-            if (u < 0) return null;
-            double v = -v0v1.Dot(dvector) * invDet; 
-            if (v < 0) return null;
-            if ((u+v) > 1.0) return null;
-            double t = tvector.Dot(vnormal) * invDet; 
-            if (t < 0) return null; */
 
             return new RayHit(vposition, vnormal, vincident, this.material);
         }

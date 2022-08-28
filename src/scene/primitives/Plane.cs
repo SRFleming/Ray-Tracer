@@ -40,7 +40,7 @@ namespace RayTracer
                 double t = (L.Dot(this.normal) / denom);
                 if (t >= 0) {
                     vposition = ray.Origin + t * ray.Direction;
-                    vnormal = this.normal;
+                    vnormal = this.normal.Normalized();
                     vincident = this.normal.Cross(ray.Direction);
                     return new RayHit(vposition, vnormal, vincident, this.Material);
                 }
