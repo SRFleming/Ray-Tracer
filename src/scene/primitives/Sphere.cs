@@ -35,7 +35,6 @@ namespace RayTracer
             double d0, d1; //q;
             Vector3 vposition = new Vector3(0,0,0); 
             Vector3 vnormal = new Vector3(0,0,0); 
-            Vector3 vincident = new Vector3(0,0,0);
             Vector3 L = this.center - ray.Origin;
 
             double tca = L.Dot(ray.Direction); 
@@ -78,7 +77,7 @@ namespace RayTracer
             //Console.WriteLine("PASS");
             Vector3 helper = vposition - this.center;
             vnormal = helper.Normalized();
-            return new RayHit(vposition, vnormal, vincident, this.material);
+            return new RayHit(vposition, vnormal, ray.Direction, this.material);
             
         }
 

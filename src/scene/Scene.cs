@@ -88,19 +88,32 @@ namespace RayTracer
             return outputColor;
         }
 
-        /*private Color Reflect() {
+        private Color Reflect(Ray incidentray, int depth) {
             Color color = new Color(0,0,0);
+            Vector3 Origin = new Vector3(0,0,0);
+            double distancetohit = 10000;
             foreach (SceneEntity entity in this.entities) {
-                RayHit hit = entity.Intersect(ray);
+                RayHit hit = entity.Intersect(incidentray);
                 if (hit != null) {
-                    if (entity)
-                }
-                else {
-
+                    double temp = (hit.Position- Origin).LengthSq();
+                    if (temp < distancetohit) {
+                        distancetohit = temp;
+                        if (entity.Material.Type == Material.MaterialType.Diffuse) {
+                            color = Diffuse(entity, hit, incidentray);
+                        }
+                        else if (entity.Material.Type == Material.MaterialType.Reflective){
+                            Vector3 reflectedvector = hit.Incident - 2 * hit.Normal * (hit.Incident.Dot(hit.Normal));
+                            Ray reflectray = new Ray(hit.Position, reflectedvector);
+                            color = Reflect(reflectray, 0);
+                        }
+                        else {
+                            color = entity.Material.Color;
+                        }
+                    }
                 }
             }
             return color;
-        } */
+        }
 
         public void Render(Image outputImage) {
             // Begin writing your code here...
@@ -110,31 +123,27 @@ namespace RayTracer
             //Array.Clear(hitmatrix, 0, hitmatrix.Length);
             while(i < outputImage.Width) {
                 while (j < outputImage.Height) {
+                    double distancetohit = 10000;
                     Ray ray = generateRay(i, j, outputImage.Width, outputImage.Height);
                     foreach (SceneEntity entity in this.entities) {
                         RayHit hit = entity.Intersect(ray);
                         if (hit != null) {
-                            //if (hitmatrix[i, j] == 0) {
-                            if (entity.Material.Type == Material.MaterialType.Diffuse) {
-                                Color outputColor = new Color(0,0,0);
-                                Vector3 offset = hit.Normal/10000;
-                                foreach (PointLight light in this.lights) {
-                                    Vector3 L = (light.Position - hit.Position).Normalized();
-                                    double lengthtolight = (light.Position - hit.Position).Length();
-                                    Ray lightray = new Ray(hit.Position + L/10000, L);
-                                    int hitObject = shadowtracer(lightray, lengthtolight);
-                                    if (hitObject == 0) {
-                                        Color addColor = entity.Material.Color * light.Color * (L.Dot(hit.Normal));
-                                        outputColor = outputColor + addColor;
-                                    }
+                            double temp = (hit.Position- Origin).LengthSq();
+                            if (temp < distancetohit) {
+                                distancetohit = temp;
+                                if (entity.Material.Type == Material.MaterialType.Diffuse) {
+                                    Color outputColor = Diffuse(entity, hit, ray);
+                                    outputImage.SetPixel(i, j, outputColor);
                                 }
-                                outputImage.SetPixel(i, j, outputColor);
-                            }
-                            else if (entity.Material.Type == Material.MaterialType.Reflective){
-                                
-                            }
-                            else {
-                                outputImage.SetPixel(i, j, entity.Material.Color);
+                                else if (entity.Material.Type == Material.MaterialType.Reflective) {
+                                    Vector3 reflectedvector = hit.Incident - 2 * hit.Normal * (hit.Incident.Dot(hit.Normal));
+                                    Ray reflectray = new Ray(hit.Position, reflectedvector);
+                                    Color outputColor = Reflect(reflectray, 0);   
+                                    outputImage.SetPixel(i, j, outputColor);
+                                }
+                                else {
+                                    outputImage.SetPixel(i, j, entity.Material.Color);
+                                }
                             }
                         }
                     }
@@ -150,11 +159,4 @@ namespace RayTracer
 
 //cd C:\Users\Seb\Documents\Uni\2022\Graphics and Interaction\project-1-ray-tracer-SRFleming
 //dotnet run -- -f tests/sample_scene_1.txt -o output.png
-
-                               // hitmatrix[i, j] = hit.Position.Z;
-                            //}
-                            /*else if (hit.Position.Z > hitmatrix[i, j]){
-                                outputImage.SetPixel(i, j, entity.Material.Color);
-                                hitmatrix[i, j] = hit.Position.Z;
-                            } */
 

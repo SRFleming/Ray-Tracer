@@ -33,7 +33,6 @@ namespace RayTracer
         {
             Vector3 vposition = new Vector3(0,0,0); 
             Vector3 vnormal = new Vector3(0,0,0); 
-            Vector3 vincident = new Vector3(0,0,0);
             Vector3 L = this.center - ray.Origin;
             double denom = this.normal.Dot(ray.Direction);
             if (denom != 0) {
@@ -41,8 +40,7 @@ namespace RayTracer
                 if (t >= 0) {
                     vposition = ray.Origin + t * ray.Direction;
                     vnormal = this.normal.Normalized();
-                    vincident = this.normal.Cross(ray.Direction);
-                    return new RayHit(vposition, vnormal, vincident, this.Material);
+                    return new RayHit(vposition, vnormal, ray.Direction, this.Material);
                 }
                 else {
                     return null;
