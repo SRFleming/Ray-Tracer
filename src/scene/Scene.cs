@@ -156,14 +156,15 @@ namespace RayTracer
             }
         } 
 
-        private Color hitOptions(Ray incidentray, int depth) {
+        private Color hitOptions(Ray incidentray, int depth, int i, int j) {
             Color color = new Color(0,0,0);
             Vector3 Origin = new Vector3(0,0,0);
             double distancetohit = 10000;
             foreach (SceneEntity entity in this.entities) {
                 RayHit hit = entity.Intersect(incidentray);
                 if (hit != null ) {
-                    if (depth > 10) {
+                    if (depth > 5) {
+                        //Console.WriteLine("DEPTH MAX REACHED" + "i = " + i + "j = " + j);
                         return entity.Material.Color;
                     }
                     double temp = (hit.Position - incidentray.Origin).LengthSq();
@@ -174,27 +175,30 @@ namespace RayTracer
                         }
                         else if (entity.Material.Type == Material.MaterialType.Reflective){
                             Vector3 reflectedvector = hit.Incident - 2 * hit.Normal * (hit.Incident.Dot(hit.Normal));
-                            Ray reflectray = new Ray(hit.Position + 0.0001 * reflectedvector, reflectedvector);
-                            color = hitOptions(reflectray, depth+1);
+                            Ray reflectray = new Ray(hit.Position, reflectedvector);
+                            color = hitOptions(reflectray, depth+1, i, j);
                         }
                         else if (entity.Material.Type == Material.MaterialType.Refractive) {
                             Color refractionColor = new Color(); 
+                            double offset = 0.0001;
+                            if (incidentray.Direction.Dot(hit.Normal) < 0) {
+                                offset = -offset;
+                            }
                             // compute fresnel
                             double kr = fresnel(incidentray.Direction, hit.Normal, entity.Material.RefractiveIndex); 
                             // compute refraction if it is not a case of total internal reflection
                             if (kr < 1) { 
                                 Vector3 refractionDirection = refract(incidentray.Direction, hit.Normal, entity.Material.RefractiveIndex).Normalized(); 
                                 Vector3 refractionRayOrig = hit.Position; 
-                                Ray refractray = new Ray(refractionRayOrig + 0.00001 * refractionDirection, refractionDirection);
-                                refractionColor = hitOptions(refractray, depth+1);
+                                Ray refractray = new Ray(refractionRayOrig + offset * hit.Normal, refractionDirection);
+                                refractionColor = hitOptions(refractray, depth+1, i, j);
                             }
                             Vector3 reflectionDirection = (hit.Incident - 2 * hit.Normal * (hit.Incident.Dot(hit.Normal))).Normalized();
                             Vector3 reflectionRayOrig = hit.Position;
-                            Ray reflectray = new Ray(reflectionRayOrig + 0.0001 * reflectionDirection, reflectionDirection);
-                            Color reflectionColor = hitOptions(reflectray, depth+1);
+                            Ray reflectray = new Ray(reflectionRayOrig + offset * hit.Normal, reflectionDirection);
+                            Color reflectionColor = hitOptions(reflectray, depth+1, i, j);
                                 // mix the two
-                            color += reflectionColor * kr + refractionColor * (1 - kr);  
-
+                            color = reflectionColor * kr + refractionColor * (1 - kr);
                         }
                         else if (entity.Material.Type == Material.MaterialType.Emissive) {
                             
@@ -222,7 +226,7 @@ namespace RayTracer
                             coordx = multiplierx/((double)options.AAMultiplier+1);
                             coordy = multipliery/((double)options.AAMultiplier+1);
                             Ray ray = generateRay(i, j, outputImage.Width, outputImage.Height, coordx, coordy);
-                            outputColor = hitOptions(ray, 0);
+                            outputColor = hitOptions(ray, 0, i, j);
                             averagedColor += outputColor;
                             multipliery++;
                         }
